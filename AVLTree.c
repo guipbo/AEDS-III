@@ -1,6 +1,6 @@
 /*--------------------------------------------------
- * Projeto: Lista 01 AEDSIII
- * File: Exercício 04
+ * Projeto: -
+ * File: AVLTree
  * Author: ProfGuibpo
 --------------------------------------------------*/
 
@@ -11,7 +11,6 @@
 #include <locale.h>
 #include <time.h>
 #include <math.h>
-// #include <dirent.h>
 
 /*--------------------------------------------------*/
 
@@ -19,7 +18,6 @@
 
 typedef struct node {
     int data;
-    int timestamp;
     struct node *left, *right;
 }Node;
 
@@ -39,19 +37,24 @@ Tree *createTree();
 Node *newNode(int newData);
 void printStatement();
 int isEmpty( Tree *tree );
+int isBalanced ( Tree *tree );
 
 void printPreOrder(Tree *tree);
 void printInOrder(Tree *tree);
 void printPostOrder(Tree *tree);
 int insertNode( Tree *tree, int value );
+int removeNode( Tree *tree, int value );
 int searchNode( Tree *tree, int value );
+int clearTree( Tree *tree );
+int height( Tree *tree );
+int isComplete( Tree *tree );
+int sum( Tree *tree );
+int minValue( Tree *tree );
+int maxValue( Tree *tree );
 void insertTestTree ( Tree *tree );
 int insertRandomTree ( Tree *tree, int quant );
 
-int height( Tree *tree );
-int isComplete ( Tree *tree );
 
-int isBalanced ( Tree *tree );
 
 /*--------------------------------------------------*/
 
@@ -63,8 +66,6 @@ void main (){
     Tree *tree = createTree();
     int status = 0;
     int exit = 0;
-
-    printf("Timestamp: %d", (int)time(NULL));
 
     printStatement();
     while( exit != 1 ){
@@ -95,12 +96,12 @@ void main (){
                 printf("...)");
                 break;
             }
-            //Inserir valor
+            //Inserir valor na árvore
             case 4:{
-                printf("\n********** 4- INSERIR VALOR");
+                printf("\n********** 4- INSERIR VALOR NA ÁRVORE");
                 int newValue = 0;
 
-                printf("\n\nDigite um valor a ser inserido na árvore: ");
+                printf("\n\nDigite o valor a ser inserido na árvore: ");
                 scanf("%d", &newValue);
 
                 status = insertNode(tree, newValue);
@@ -109,48 +110,97 @@ void main (){
 
                 break;
             }
-            //Procurar valor
+            //Remover valor da árvore
             case 5:{
-                printf("\n********** 5- PROCURAR VALOR");
+                printf("\n********** 5- REMOVER VALOR DA ÁRVORE");
+                int removeValue = 0;
+
+                printf("\n\nDigite o valor a ser removido da árvore: ");
+                scanf("%d", &removeValue);
+
+
+                break;
+            }
+            //Pesquisar valor
+            case 6:{
+                printf("\n********** 6- PESQUISAR VALOR");
                 int search = 0;
-                printf("\n\nDigite o valor que deseja procurar: ");
+                printf("\n\nDigite o valor que deseja pequisar: ");
                 scanf("%d", &search);
                 
                 status = searchNode(tree, search);
 
-                if(status != 1) printf("\n%d não encontrado!", search);
+                status == 1 ? printf("\n%d existe na árvore!", search) : printf("\n%d não existe na árvore!", search);
 
                 break;
             }
-            //Completa?
-            case 6:{
-                printf("\n********** 6- ÁRVORE COMPLETA?");
+            //Limpar árvore
+            case 7:{
+                printf("\n********** 7- LIMPAR ÁRVORE");
+
+                break;
+            }
+            //Imprimir altura da árvore
+            case 8:{
+                printf("\n********** 8- IMPRIMIR ALTURA DA ÁRVORE");
+                
+                break;
+            }
+            //Imprimir se a árvore está completa
+            case 9:{
+                printf("\n********** 9- IMPRIMIR SE A ÁRVORE ESTÁ COMPLETA");
                 status = isComplete(tree);
                 printf("\nÁrvore: (");
                 printPreOrder(tree);
                 printf("...) ");
-                status == 1 ? printf("é completa.") : printf("NÃO é completa.");
+                status == 1 ? printf("está completa.") : printf("NÃO está completa.");
                 break;
             }
-            //Balanceada?
-            case 7:{
-                printf("\n********** 7- ÁRVORE BALANCEADA?");
-                status = isBalanced(tree);
-                printf("\nÁrvore: (");
-                printPreOrder(tree);
-                printf("...) ");
-                status == 1 ? printf("é balanceada.") : printf("NÃO é balanceada.");
+            //Imprimir soma dos valores da árvore
+            case 10:{
+                printf("\n********** 10- IMPRIMIR SOMA DOS VALORES DA ÁRVORE");
+                
                 break;
             }
-            //Inserir árvore de teste
-            case 97:{
-                printf("\n********** 97- INSERIR ÁRVORE DE TESTE");
+            //Imprimir valor mínimo
+            case 11:{
+                printf("\n********** 11- IMPRIMIR VALOR MÍNIMO");
+                
+                break;
+            }
+            //Imprimir valor máximo
+            case 12:{
+                printf("\n********** 12- IMPRIMIR VALOR MÁXIMO");
+                
+                break;
+            }
+            //Imprimir quantidade de registros
+            case 13:{
+                printf("\n********** 13- IMPRIMIR QUANTIDADE DE REGISTROS");
+                
+                break;
+            }
+            //Imprimir quantidade de não folhas
+            case 14:{
+                printf("\n********** 14- IMPRIMIR QUANTIDADE DE NÃO FOLHAS");
+                
+                break;
+            }
+            //Imprimir quantidade de folhas
+            case 15:{
+                printf("\n********** 15- IMPRIMIR QUANTIDADE DE FOLHAS");
+                
+                break;
+            }
+            //Inserir valores de teste
+            case 16:{
+                printf("\n********** 16- INSERIR VALORES DE TESTE");
                 insertTestTree(tree);
                 break;
             }
-            //Inserir árvore aleatória
-            case 98:{
-                printf("\n********** 98- INSERIR ÁRVORE ALEATÓRIA");
+            //Inserir valores aleatórios
+            case 17:{
+                printf("\n********** 17- INSERIR VALORES ALEATÓRIOS");
                 int quant=0;
                 printf("\nInsira a quantidade de valores aleatórios que serão inseridos na árvore: ");
                 scanf("%d", &quant);
@@ -175,8 +225,7 @@ void main (){
             }
             //Sair
             case 0: {
-                printf("\nTem certeza que deseja sair?\nDigite 1 para sim: ");
-                scanf("\r%d", &exit);
+                exit = 1;
                 break;
             }
             //Opção incorreta
@@ -206,19 +255,28 @@ int mainMenu(){
     int option=0;
 
     printf("\n--------------------------------------------------");
-    printf("\n********** MAIN MENU");
+    printf("\n\n********** MAIN MENU");
+    printf("\n    Escolha uma das opções abaixo");
     printf("\n1- Imprimir Pre ordem;");
     printf("\n2- Imprimir In ordem;");
     printf("\n3- Imprimir Pos ordem;");
-    printf("\n4- Inserir valor;");
-    printf("\n5- Procurar valor;");
-    printf("\n6- Árvore é completa?;");
-    printf("\n7- Árvore é balanceada?;");
-    printf("\n97- Inserir árvore de teste;");
-    printf("\n98- Inserir árvore aleatória;");
+    printf("\n4- Inserir valor na árvore;");
+    printf("\n5- Remover valor da árvore;");
+    printf("\n6- Pesquisar valor;");
+    printf("\n7- Limpar árvore;");
+    printf("\n8- Imprimir altura da árvore;");
+    printf("\n9- Imprimir se a árvore está completa;");
+    printf("\n10- Imprimir soma dos valores da árvore;");
+    printf("\n11- Imprimir valor mínimo;");
+    printf("\n12- Imprimir valor máximo;");
+    printf("\n13- Imprimir quantidade de registros;");
+    printf("\n14- Imprimir quantidade de não folhas;");
+    printf("\n15- Imprimir quantidade de folhas;");
+    printf("\n16- Inserir valores de teste;");
+    printf("\n17- Inserir valores aleatórios;");
     printf("\n99- Limpar tela;");
     printf("\n0- Sair.");
-    printf("\n\nSelecione: ");
+    printf("\n\n-----> ");
     scanf("\r%d", &option);
 
     return option;
@@ -267,8 +325,7 @@ void printPostOrder(Tree *tree){
 }
 
 void printStatement(){
-    printf("\n********** EXERCÍCIO 04 **********");
-    printf("\n\nNum sistema de arquivos.txt (Diretório informado pelo usuário), um catálogo de todos os arquivos é organizado como uma árvore de busca binária AVL. Cada nó denota um arquivo e especifica seu nome e a data de seu último acesso, codificada como um inteiro. Obs A Data de Acesso devem estar informados dento do arquivo. A data deve estar formata em DD/MM/YYYY.\n    Escreva um programa que percorra a árvore e apague todos os arquivos cujos últimos acessos tenham sido anteriores a uma certa data informada pelo usuário. As chaves do catálogo são os nomes dos arquivos;\n    b. O programa também deverá permitir consultar os arquivos presentes na lista.");
+    printf("\n********** Árvore AVL **********");
     printf("\n");
 }
 
@@ -337,10 +394,8 @@ int isBalanced( Tree *tree ){
 
 int searchNode( Tree *tree, int value ){
     if ( tree->root != NULL ){
-        if(tree->root->data == value){
-            printf("\n%d encontrado.", tree->root->data);
+        if(tree->root->data == value)
             return 1;
-        }
         else if ( tree->root->data > value )
             searchNode(&(tree->root->left), value);
         else if ( tree->root->data < value )
