@@ -30,14 +30,19 @@ typedef struct tree{
 //FUNCTIONS LIST
 
 void delay( unsigned int mseconds );
-
 int mainMenu();
-
 Tree *createTree();
 Node *newNode(int newData);
 void printStatement();
 int isEmpty( Tree *tree );
-int isBalanced ( Tree *tree );
+int balanceFactor ( Tree *tree );
+Node *biggerLeft( Tree *tree );
+Node *smallerRight( Tree *tree );
+void leftRotation( Tree *tree );
+void rightRotation( Tree *tree );
+void rlRotation( Tree *tree );
+void lrRotation( Tree *tree );
+int balance( Tree *tree );
 
 void printPreOrder(Tree *tree);
 void printInOrder(Tree *tree);
@@ -48,13 +53,15 @@ int searchNode( Tree *tree, int value );
 int clearTree( Tree *tree );
 int height( Tree *tree );
 int isComplete( Tree *tree );
+int totalSum = 0;
 int sum( Tree *tree );
 int minValue( Tree *tree );
 int maxValue( Tree *tree );
-void insertTestTree ( Tree *tree );
-int insertRandomTree ( Tree *tree, int quant );
-
-
+int countNodes( Tree *tree );
+int countNonLeaves( Tree* tree );
+int countLeaves( Tree* tree );
+void insertTestTree( Tree *tree );
+int insertRandomTree( Tree *tree, int quant );
 
 /*--------------------------------------------------*/
 
@@ -246,7 +253,7 @@ void main (){
 
 //FUNCTIONS
 
-void delay ( unsigned int mseconds ){
+void delay( unsigned int mseconds ){
     clock_t goal = mseconds + clock();
     while(goal>clock());
 }
@@ -290,7 +297,7 @@ Tree *createTree(){
     return tree;
 }
 
-Node *newNode(int newData){
+Node *newNode( int newData ){
     Node *newNode = (Node*)malloc(sizeof(Node));
 
     newNode->data = newData;
@@ -298,6 +305,57 @@ Node *newNode(int newData){
     newNode->left = NULL;
 
     return newNode;
+}
+
+void printStatement(){
+    printf("\n********** Árvore AVL **********");
+    printf("\n");
+}
+
+int isEmpty( Tree *tree ){
+    if(tree->root == NULL || tree == NULL)
+        return 1;
+    return 0;
+}
+
+int balanceFactor( Tree *tree ){
+
+    int balance = 0;
+
+    balance = height(&(tree->root->right)) - height(&(tree->root->left));
+
+    if( balance >= -1 && balance <= 1)
+        return 1;
+
+    return 0;
+}
+
+Node *biggerLeft( Tree *tree ){
+
+}
+
+Node *smallerRight( Tree *tree ){
+
+}
+
+void leftRotation( Tree *tree ){
+
+}
+
+void rightRotation( Tree *tree ){
+
+}
+
+void rlRotation( Tree *tree ){
+
+}
+
+void lrRotation( Tree *tree ){
+
+}
+
+int balance( Tree *tree ){
+
 }
 
 void printPreOrder(Tree *tree){
@@ -324,17 +382,6 @@ void printPostOrder(Tree *tree){
     }
 }
 
-void printStatement(){
-    printf("\n********** Árvore AVL **********");
-    printf("\n");
-}
-
-int isEmpty( Tree *tree ){
-    if(tree->root == NULL || tree == NULL)
-        return 1;
-    return 0;
-}
-
 int insertNode( Tree *tree, int value ){
     Node *newNode = (Node*)malloc(sizeof(Node));
     if( newNode == NULL )
@@ -355,6 +402,36 @@ int insertNode( Tree *tree, int value ){
         insertNode(&(tree->root->right), value);
 }
 
+int removeNode( Tree *tree, int value ){
+
+}
+
+int searchNode( Tree *tree, int value ){
+    if ( tree->root != NULL ){
+        if(tree->root->data == value)
+            return 1;
+        else if ( tree->root->data > value )
+            searchNode(&(tree->root->left), value);
+        else if ( tree->root->data < value )
+            searchNode(&(tree->root->right), value);
+    }
+}
+
+int clearTree( Tree *tree ){
+    
+}
+
+int height( Tree *tree ){
+    if(tree->root != NULL){
+        int leftHeight = height(&(tree->root->left)) + 1;
+        int rightHeight = height(&(tree->root->right)) + 1;
+
+        if( leftHeight > rightHeight )
+            return leftHeight;
+        return rightHeight;
+    }
+}
+
 int isComplete( Tree *tree ){
     if( tree->root != NULL ){
         if( tree->root->right == NULL && tree->root->left != NULL )
@@ -369,41 +446,31 @@ int isComplete( Tree *tree ){
     }
 }
 
-int height( Tree *tree ){
-    if(tree->root != NULL){
-        int leftHeight = height(&(tree->root->left)) + 1;
-        int rightHeight = height(&(tree->root->right)) + 1;
+int sum( Tree *tree ){
 
-        if( leftHeight > rightHeight )
-            return leftHeight;
-        return rightHeight;
-    }
 }
 
-int isBalanced( Tree *tree ){
+int minValue( Tree *tree ){
 
-    int balance = 0;
-
-    balance = height(&(tree->root->right)) - height(&(tree->root->left));
-
-    if( balance >= -1 && balance <= 1)
-        return 1;
-
-    return 0;
 }
 
-int searchNode( Tree *tree, int value ){
-    if ( tree->root != NULL ){
-        if(tree->root->data == value)
-            return 1;
-        else if ( tree->root->data > value )
-            searchNode(&(tree->root->left), value);
-        else if ( tree->root->data < value )
-            searchNode(&(tree->root->right), value);
-    }
+int maxValue( Tree *tree ){
+
 }
 
-int insertRandomTree (Tree *tree, int quant){
+int countNodes( Tree *tree ){
+
+}
+
+int countNonLeaves( Tree* tree ){
+
+}
+
+int countLeaves( Tree* tree ){
+
+}
+
+int insertRandomTree(Tree *tree, int quant){
     int value = 0;
 
     for( int i=0; i<quant; i++ ){
@@ -414,7 +481,7 @@ int insertRandomTree (Tree *tree, int quant){
     return 1;
 }
 
-void insertTestTree ( Tree *tree ){
+void insertTestTree( Tree *tree ){
     int value [18] = {15, 6, 12, 9, 14, 13, 25, 18, 20, 23, 5, 3, 38, 45, 50, 48, 46, 60};
 
     printf("\nÁrvore inserida: (");
