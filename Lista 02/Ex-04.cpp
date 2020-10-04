@@ -26,10 +26,10 @@ Graph *createGraph();
 int insertEdge( Graph* graph, int source, int destination, int isDigraph, float weight );
 int removeEdge( Graph* graph, int source, int destination, int isDigraph );
 void printGraph( Graph* graph );
-int array[100];
-int test, o = 0;
-void searchDepth( Graph* graph, int initial, int* visited, int counter );
-void searchDepth_Graph( Graph* graph, int initial, int* visited );
+int success = 0;
+void depthSearch( Graph* graph, int start, int destiny, int* visited, int count );
+int depthSearchInterface( Graph* graph, int start, int destiny, int* visited );
+
 /*--------------------------------------------------*/
 //MAIN
 
@@ -49,6 +49,7 @@ int main(){
         status = 0;
         source = 0;
         destination = 0;
+        success = 0;
         switch( menu() ){
             //Inserir no grafo
             case 1: {
@@ -85,19 +86,20 @@ int main(){
             }
             //Busca de profundidade
             case 3: {
-                // int source, destination;
-                // int visited[100];
-                // printf("\n----- Busca de Profundidade -----");
-                // printf("\nDIGITE");
-                // printf("\n");
-                // printf("\nOrigem: ");
-                // scanf("%d", &source);
-                // printf("\nDestino: ");
-                // scanf("%d", &destination);
+                int visited[100];
+                printf("\n----- Busca de Profundidade (LABIRINTO) -----");
+                printf("\nDIGITE");
+                printf("\n");
+                printf("\nOrigem: ");
+                scanf("%d", &source);
+                printf("\nDestino: ");
+                scanf("%d", &destination);
 
-                // searchDepth_Graph( graph, 0, visited );
+                status = depthSearchInterface( graph, source, destination, visited );
 
-                test = 0;
+                status != 1 
+                ? printf("\nSaída do labirinto inexistente!")
+                : printf("\nSucesso ao encontrar o caminho de saída.");
                 break;
             }
             case 4: {
@@ -145,7 +147,7 @@ int menu(){
             "\nDigite a opção desejada: "
             "\n1- Inserir no grafo;"
             "\n2- Remover no grafo;"
-            "\n3- Buscar por profundidade;"
+            "\n3- Buscar por profundidade (LABIRINTO);"
             "\n4- Imprimir grafo;"
             "\n0- Sair"
             "\n\n-----> ");
@@ -232,90 +234,29 @@ void printGraph( Graph* graph ){
     }
 }
 
+void depthSearch( Graph* graph, int start, int destiny, int* visited, int count ){
+    visited[start] = count;
+    for( int i = 0; i < graph->degree[start]; i++ ){
+        if( visited[graph->edges[start][i]] == 0 ){
+            if( graph->edges[start][i] != destiny )
+                printf("%d, ", graph->edges[start][i]);
+            else
+                success++; 
+            depthSearch( graph, graph->edges[start][i], destiny, visited, count++);
+        }
+    }
+}
 
-
-
-
-
-// int insertEdge( Graph* graph ){
-//     if( graph == NULL )
-//         return 0;
-//     printf("\n----- INSERIR ARESTA -----");
-//     printf("\nDIGITE");
-//     printf("\n");
-
-//     int source;
-//     int destination;
-//     printf("\nOrigem: ");
-//     scanf("%d", &source);
-//     printf("Destino: ");
-//     scanf("%d", &destination);
-
-//     if( source < 0 || source >= graph->maxDegree )
-//         return 0;
-//     if( destination < 0 || destination >= graph->maxDegree )
-//         return 0;
-
-//     //Liga origem ao destino
-//     graph->edges[source][graph->degree[source]] = destination;
-//     graph->degree[source]+=1;
-//     //Liga destino à origem
-//     graph->edges[destination][graph->degree[destination]] = source;
-//     graph->degree[destination]+=1;
-
-//     return 1;
-// }
-
-// int removeEdge( Graph* graph ){
-//     if( graph == NULL )
-//         return 0;
-//     printf("\n----- REMOVER ARESTA -----");
-//     printf("\nDIGITE");
-//     printf("\n");
-
-//     int source;
-//     int destination;
-//     printf("\nOrigem: ");
-//     scanf("%d", &source);
-//     printf("Destino: ");
-//     scanf("%d", &destination);
-
-//     if( source < 0 || source >= graph->maxDegree )
-//         return 0;
-//     if( destination < 0 || destination >= graph->maxDegree )
-//         return 0;
-
-//     int i = 0;
-//     while( i < graph->degree[source] && graph->edges[source][i] != destination )
-//         i++;
-//     //Não encontrado
-//     if( i == graph->degree[source] )
-//         return 0;
-//     graph->degree[source]--;
-//     graph->edges[source][i] = graph->edges[source][graph->degree[source]];
-   
-//     i = 0;
-//     while( i < graph->degree[destination] && graph->edges[destination][i] != source )
-//         i++;
-//     if( i == graph->degree[destination] )
-//         return 0;
-//     graph->degree[destination]--;
-//     graph->edges[destination][i] = graph->edges[destination][graph->degree[destination]];
-
-//     return 1;
-// }
-
-// void searchDepth( Graph* graph, int initial, int* visited, int counter ){
-//     visited[initial] = counter;
-//     for( int i = 0; i < graph->degree[initial]; i++ ){
-//         printf("Visitado: %d", graph->edges[initial][i]);
-//         if( !visited[graph->edges[initial][i]])
-//             searchDepth(graph, graph->edges[initial][i], visited, counter+1);
-//     }
-// }
-
-// void searchDepth_Graph( Graph* graph, int initial, int* visited ){
-//     for( int i = 0; i < graph->noVertex; i++ )
-//         visited[i] = 0;
-//     searchDepth(graph, initial, visited, 1);
-// }
+int depthSearchInterface( Graph* graph, int start, int destiny, int* visited ){
+    int count = 1;
+    for( int i = 0; i < graph->noVertex; i++ )
+        visited[i] = 0;
+    printf("\nCaminho: %d, ", start);
+    depthSearch( graph, start, destiny, visited, count );
+    if( success != 0 ){
+        printf("%d.", destiny);
+        return 1;
+    }
+    else
+        printf("(...)");
+}
