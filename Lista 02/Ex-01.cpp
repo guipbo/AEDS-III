@@ -2,124 +2,157 @@
 //BIBLIOTECAS
 #include <stdio.h>
 #include <stdlib.h>
-#define INDEX 5
+#include <string.h>
+#include <time.h>
+#define INDICE 20
 
 /*--------------------------------------------------*/
 //TAD
+typedef struct info{
+	int grade1;
+	int grade2;
+	int grade3;
+	int miss;
+};
+
 typedef struct page{;
-	int numInsc;
-	int numBrothers;
+	info *information;
+	int noRegistration;
+	int noBrothers;
+	struct page *father;
 	struct page *next;
-	struct page *fil;
-}page;
+	struct page *son;
+};
 
 typedef struct bTree{
-	page *students;
+	page *student;
 	int numele;
-}bTree;
+};
 
 /*--------------------------------------------------*/
 //INICIALIZAÇÃO FUNÇÕES
-void printStatement();
 bTree *createTree();
-void insert(int va, bTree *a);
-void insertSt(page *at, page *st, page *in, bTree *a);
-void reorder(page *at, bTree *a);
+void insert( int va, bTree *tree );
+void insertStudent( page *at, page *student, page *in, bTree *tree );
+void reorder( page *at, bTree *tree );
+void print( page *n );
+void fill( page *student );
+int search( page *student, int va );
 
 /*--------------------------------------------------*/
 //MAIN
 int main(){
+
+	int status = 0;
 	int exit = 0;
-	bTree *a = createTree();
-	printStatement();
+	int registration, qqr;
+	srand(time(NULL));
+	bTree *tree = createTree();
 
-	insert(1, a);
-	insert(2, a);
-	insert(3, a);
-	insert(4, a);
-	insert(5, a);
-	insert(6, a);
-	insert(7, a);
-	insert(8, a);
-	insert(9, a);
-	insert(10, a);
-	printf("Número de irmãos de %d = %d", a->students->numInsc, a->students->numBrothers);
+	for(int x = 0; x < 100; ++x){
+		registration = (rand() % 1000) + 1000;
+		insert(registration, tree);
+	}
 
-	printf("\n\n");
+	printf("Alunos cadastrados: ");
+	print(tree->student);
+	printf("\nDigite um número de inscrição para encontrar: ");
+	scanf("%d", &qqr);
+	status = search(tree->student, qqr);
+
+	status != 1 
+		? printf("\nInscrição não encontrada!")
+		: printf("\nInscrição encontrada");
+
+	printf("\n");
 	scanf("%d", &exit);
 }
-
 /*--------------------------------------------------*/
 //FUNÇÕES
-void printStatement(){
-    printf("\n************************************************");
-    printf("\n\n1. Escreva um algoritmo utilizando arvore b. Para a implementação da arvore b utilize a ordem 20. A estrutura que será utilizada terá como chave o número de inscrição do aluno, o conteúdo será o histórico (disciplinas, notas e faltas).");
-    printf("\n\n************************************************\n\n");
-}
-
 bTree *createTree(){
-	bTree *a = (bTree *) malloc(sizeof(bTree));
-	a->numele = 0;
-	a->students = NULL;
-
-	return a;
+	bTree *tree = (bTree *) malloc(sizeof(bTree));
+	tree->numele = 0;
+	tree->student = NULL;
 }
 
-void insert(int va, bTree *a){
-	page *st = (page *) malloc(sizeof(page));
-	st->next = NULL;
-	st->fil = NULL;
-	st->numBrothers = 0;
-	st->numInsc = va;
-	if(a->students == NULL){
-		a->students = st;
+void insert(int va, bTree *tree){
+	page *student = (page *) malloc(sizeof(page));
+	student->next = NULL;
+	student->son = NULL;
+	student->father = NULL;
+	student->noBrothers = 0;
+	student->noRegistration = va;
+	fill(student);
+	if(tree->student == NULL){
+		tree->student = student;
 	}else{
-		page *aux = a->students;
-		insertSt(aux, st, aux, a);
+		page *aux = tree->student;
+		insertStudent(aux, student, aux, tree);
 	}
 }
 
-void insertSt(page *at, page *st, page *in, bTree *a){
+void insertStudent(page *at, page *student, page *in, bTree *tree){
 	if(at != NULL){
-		if(at->numInsc > st->numInsc){
-			if(at->fil == NULL){
-				at->fil = st;
+		if(at->noRegistration > student->noRegistration){
+			if(at->son == NULL){
+				student->father = at;
+				at->son = student;
 			}else{
-				insertSt(at->fil, st, at->fil, a);
+				insertStudent(at->son, student, at->son, tree);
 			}
 		}else{
-			++at->numBrothers;
-			st->numBrothers = at->numBrothers;
+			++at->noBrothers;
+			student->noBrothers = at->noBrothers;
 			if(at->next == NULL){
-				at->next = st;
-				if(at->numBrothers == INDEX - 1){
-					reorder(in, a);
+				if(at->noBrothers == INDICE - 1){
+					printf("Algo compilou errado por favor tentar novamente\n");
+					reorder(in, tree);
 				}
+				at->next = student;
 			}else{
-				insertSt(at->next, st, in, a);
+				insertStudent(at->next, student, in, tree);
 			}
 		}
 	}
 }
 
-void reorder(page *at, bTree *a){
-	page *aux = at, *auxin = at, *aux2, *auxreset = at;
-	while(auxreset->next != NULL){
-		auxreset->numBrothers = (INDEX / 2);
-		auxreset = auxreset->next;
+void reorder(page *at, bTree *tree){
+	page *inicial = at, *aux = at;
+	while(aux->next->next != NULL){
+		aux = aux->next; 
 	}
-	auxreset->numBrothers = (INDEX / 2);
-	if(at->fil == NULL){	
-		for(int x = 0; x < (INDEX / 2) - 1; ++x){
-			aux = aux->next;
-		}
-		aux2 = aux->next;
-		aux->next = NULL;
-		aux2->fil = aux;
-		at = aux2;
-		at->fil = auxin;
-		if(a->students->numInsc == at->fil->numInsc){
-			a->students = at;
-		}
+	inicial->father->son = aux->next;
+	aux->next->son = inicial;
+	inicial->father = aux->next;
+	aux->next = NULL;
+}
+
+void print(page *n){
+	printf("[%d]  ", n->noRegistration, n->information->grade1, n->information->grade2, n->information->grade3, n->information->miss);
+	if(n->son != NULL){
+		print(n->son);
+	}
+	if(n->next != NULL){
+		print(n->next);
+	}
+}
+
+void fill(page *student){
+	info *i = (info *) malloc(sizeof(info));
+	i->grade1 = rand() % 10 + 1;
+	i->grade2 = rand() % 10 + 1;
+	i->grade3 = rand() % 10 + 1;
+	i->miss = rand() % 30;
+	student->information = i;
+}
+
+int search(page *student, int va){
+	if(student->noRegistration == va){
+		printf("O aluno de numero de inscricao [%d] tem nota %d em matematica, %d em portugues e %d em ciencias\nNumero de faltas: %d\n\n", student->noRegistration, student->information->grade1, student->information->grade2, student->information->grade3, student->information->miss);
+		return 1;
+	}else if(va < student->noRegistration && student->son != NULL){
+		search(student->son, va);
+	}else if(va > student->noRegistration && student->next != NULL){
+		search(student->next, va);
 	}
 }
