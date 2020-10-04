@@ -23,6 +23,10 @@ Graph *createGraph();
 
 int insertEdge( Graph* graph );
 int removeEdge( Graph* graph );
+int array[100];
+int test, o = 0;
+void searchDepth( Graph* graph, int initial, int* visited, int counter );
+void searchDepth_Graph( Graph* graph, int initial, int* visited );
 /*--------------------------------------------------*/
 //MAIN
 
@@ -52,6 +56,23 @@ int main(){
                 status != 1 
                 ? printf("\nErro ao remover!")
                 : printf("\nSucesso na remoção");
+                break;
+            }
+            //Busca de profundidade
+            case 3: {
+                int source, destination;
+                int visited[100];
+                printf("\n----- Busca de Profundidade -----");
+                printf("\nDIGITE");
+                printf("\n");
+                printf("\nOrigem: ");
+                scanf("%d", &source);
+                printf("\nDestino: ");
+                scanf("%d", &destination);
+
+                searchDepth_Graph( graph, 0, visited );
+
+                test = 0;
                 break;
             }
             //Sair
@@ -95,8 +116,7 @@ int menu(){
             "\nDigite a opção desejada: "
             "\n1- Inserir no grafo;"
             "\n2- Remover no grafo;"
-            "\n3- "
-            "\n4- "
+            "\n3- Buscar por profundidade;"
             "\n0- Sair"
             "\n\n-----> ");
     scanf("\r%d", &option);
@@ -151,10 +171,10 @@ int insertEdge( Graph* graph ){
 
     //Liga origem ao destino
     graph->edges[source][graph->degree[source]] = destination;
-    graph->degree[source]++;
+    graph->degree[source]+=1;
     //Liga destino à origem
     graph->edges[destination][graph->degree[destination]] = source;
-    graph->degree[destination]++;
+    graph->degree[destination]+=1;
 
     return 1;
 }
@@ -196,4 +216,19 @@ int removeEdge( Graph* graph ){
     graph->edges[destination][i] = graph->edges[destination][graph->degree[destination]];
 
     return 1;
+}
+
+void searchDepth( Graph* graph, int initial, int* visited, int counter ){
+    visited[initial] = counter;
+    for( int i = 0; i < graph->degree[initial]; i++ ){
+        printf("Visitado: %d", graph->edges[initial][i]);
+        if( !visited[graph->edges[initial][i]])
+            searchDepth(graph, graph->edges[initial][i], visited, counter+1);
+    }
+}
+
+void searchDepth_Graph( Graph* graph, int initial, int* visited ){
+    for( int i = 0; i < graph->qntVertex; i++ )
+        visited[i] = 0;
+    searchDepth(graph, initial, visited, 1);
 }
