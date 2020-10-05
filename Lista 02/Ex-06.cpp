@@ -1,237 +1,261 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<locale.h>
-#include<stdbool.h>
+/*--------------------------------------------------*/
+//BIBLIOTECAS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+#include <time.h>
 #define MAX 100000
 
-
-/*-----------------------------------------Structs-----------------------------------------*/
-typedef struct graph Grafo;
+/*--------------------------------------------------*/
+//TAD
+typedef struct graph Graph;
 struct graph{
-    int ehponderado;
-    int numVert;
-    int maxGrau;
-    int** arestas;
-    float** pesos;
-    int* grau;
+    int isWeighted;
+    int noVertex;
+    int maxDegree;
+    int** edges;
+    float** weight;
+    int* degree;
 };
 
+/*--------------------------------------------------*/
+//INICIALIZAÇÃO FUNÇÕES
+graph* createGraph( int noVertex, int maxDegree, int isWeighted );
+void freeGraph( graph* _graph );
+void printStatement();
+int menu();
+void delay( unsigned int mseconds );
 
-/*-----------------------------------------Funcoes-----------------------------------------*/
-graph* criaGrafo(int numVert, int maxGrau, int ponderado);
-void liberaGrafo(graph* grafo);
-int insereAresta(graph* grafo, int ini, int dest, int ehdigrafo, float peso);
-void insere(int *vertice, int *aresta, int n, float *peso);
-int removeAresta(graph* gr, int orig, int dest, int ehdigrafo);
-int procuraMenorDist(float *dist, int *visit, int numVert);
-void menorCaminhoGrafo(graph *grafo, int ini, int *ant, float *dist);
-void mostraMenorCaminho(graph* grafo,int n);
-void imprimeGrafo(graph *grafo);
+int insertEdge( graph* _graph, int start, int destination, int isDigraph, float weight );
+void insert( int *vertex, int *edge, int n, float *weight );
+int removeEdge( graph* _graph, int orig, int destination, int isDigraph );
+int searchBetterWay( float *dist, int *visited, int noVertex );
+void betterWay( graph *_graph, int start, int *ant, float *dist );
+void printfBetterWay( graph* _graph, int n );
+void printGraph( graph *_graph );
 
-
-/*-----------------------------------------Main-----------------------------------------*/
+/*--------------------------------------------------*/
+//MAIN
 int main(){
-	bool sair = false;
-    int opcao = 0, vertini=0, vertsai=0;
-    float peso=0;
-	int ehdigrafo = 1, n, vertice, aresta;
+	int exit = 0;
+    float weight=0;
+	int isDigraph = 1, n, vertex, edge;
 	
 
 	printf("Digite o total de vertices: ");
 	scanf("%d",&n);
 	
-	Grafo* grafo = criaGrafo(n, n, 1);
+	Graph* _graph = createGraph(n, n, 1);
 	
-	int vis[vertsai];
-	int i, ant[n];
-    float dist[n];
+	int vis[100];
+	int i, ant[100];
+    float dist[100];
 	
-	//Menu
-	do{
-    	system("cls");
-        printf("1 - Inserir no grafo\n"
-        "2 - Imprimir o grafo\n"
-        "3 - Buscar Menor Caminho\n"
-        "4 - sair\n");
-        printf("\nOpcao: ");
-        scanf("%d", &opcao);
+    while( exit != 1 ){
+        printStatement();
         fflush(stdin);   
-    	
-    	switch(opcao){
-    		
-    		case 1:
-    			insere(&vertice, &aresta, n, &peso);
-                insereAresta(grafo, vertice, aresta, ehdigrafo, peso);
+    	switch(menu()){
+    		case 1:{
+    			insert(&vertex, &edge, n, &weight);
+                insertEdge(_graph, vertex, edge, isDigraph, weight);
                 break;
-                
-                
-            case 2:
+            }
+            case 2:{
             	printf("\nGrafo: \n");
-                imprimeGrafo(grafo);
+                printGraph(_graph);
                 printf("\n");
                 system("PAUSE");
                 break;
-                
-                
-            case 3:
+            }
+            case 3:{
             	printf("\nMenor caminho: \n");
             	ant[n];
     			dist[n];
-                menorCaminhoGrafo(grafo, 0, ant, dist);
+                betterWay(_graph, 0, ant, dist);
                 printf("\nTabela:\n\n");
                 printf("Distancia: \n");
 			    for(i=0; i<5; i++)
 			       printf(" %d:   %d ->    %f\n",i,ant[i],dist[i]);
 				
-				mostraMenorCaminho(grafo,n);
+				printfBetterWay(_graph,n);
 				printf("\n");
                 system("PAUSE");
                 break;
-                
-                
-            case 4:
-            	sair = true;
+            }
+            case 0:{
+            	exit = true;
                 break;
+            }
             default :
-                sair = false;
+                exit = false;
                 break;
 		}
-    	
-	}while(sair == false);
-	 liberaGrafo(grafo);
-	
+    }
+
+    free( _graph );
+    printf("\n--------------------\n");
+    printf("Obrigado por utilizar o programa!");
+    printf("\n--------------------\n");
+    delay(3000);
 	return 0;
 }
 
+/*--------------------------------------------------*/
+//FUNÇÕES
+void delay( unsigned int mseconds ){
+    clock_t goal = mseconds + clock();
+    while(goal>clock());
+}
 
-/*-----------------------------------------Funcoes-----------------------------------------*/
-graph* criaGrafo(int numVert, int maxGrau, int ponderado){
-    Grafo *grafo;
-    grafo = (graph*) malloc(sizeof(struct graph));
-    if(grafo != NULL){
+void printStatement(){
+    printf("\n************************************************");
+    printf("\n\n6. Escreva o algoritmo implementando grafos em que o usuário poderá informar n vértices e suas arestas. Implemente a busca de menor caminho para encontrar a menor distância entre dois vértices. Obs: o grafo deve trabalhar com Pesos positivos para as arestas.");
+    printf("\n\n************************************************\n\n");
+}
+
+int menu(){
+    int option = 0;
+
+    printf("\n ----- MENU -----"
+            "\nDigite a opção desejada: "
+            "\n1 - Inserir no grafo"
+            "\n2 - Imprimir o grafo"
+            "\n3 - Buscar Menor Caminho"
+            "\n0 - Sair."
+            "\n\n-----> ");
+    printf("\nOpcao: ");
+    scanf("\r%d", &option);
+
+    return option;
+}
+
+graph* createGraph(int noVertex, int maxDegree, int isWeighted){
+    Graph *_graph;
+    _graph = (graph*) malloc(sizeof(struct graph));
+    if(_graph != NULL){
         int i;
-        grafo->numVert = numVert;
-        grafo->maxGrau = maxGrau;
-        grafo->ehponderado = (ponderado != 0)?1:0;
-        grafo->grau = (int*) calloc(numVert,sizeof(int));
+        _graph->noVertex = noVertex;
+        _graph->maxDegree = maxDegree;
+        _graph->isWeighted = (isWeighted != 0)?1:0;
+        _graph->degree = (int*) calloc(noVertex,sizeof(int));
 
-        grafo->arestas = (int**) malloc(numVert * sizeof(int*));
-        for(i=0; i<numVert; i++)
-            grafo->arestas[i] = (int*) malloc(maxGrau * sizeof(int));
+        _graph->edges = (int**) malloc(noVertex * sizeof(int*));
+        for(i=0; i<noVertex; i++)
+            _graph->edges[i] = (int*) malloc(maxDegree * sizeof(int));
 
-        if(grafo->ehponderado){
-            grafo->pesos = (float**) malloc(numVert * sizeof(float*));
-            for(i=0; i<numVert; i++)
-                grafo->pesos[i] = (float*) malloc(maxGrau * sizeof(float));
+        if(_graph->isWeighted){
+            _graph->weight = (float**) malloc(noVertex * sizeof(float*));
+            for(i=0; i<noVertex; i++)
+                _graph->weight[i] = (float*) malloc(maxDegree * sizeof(float));
         }
 
     }
-    return grafo;
+    return _graph;
 }
 
-void liberaGrafo(graph* grafo){
-    if(grafo != NULL){
+void freeGraph(graph* _graph){
+    if(_graph != NULL){
         int i;
-        for(i=0; i<grafo->numVert; i++)
-            free(grafo->arestas[i]);
-        free(grafo->arestas);
+        for(i=0; i<_graph->noVertex; i++)
+            free(_graph->edges[i]);
+        free(_graph->edges);
 
-        if(grafo->ehponderado){
-            for(i=0; i<grafo->numVert; i++)
-                free(grafo->pesos[i]);
-            free(grafo->pesos);
+        if(_graph->isWeighted){
+            for(i=0; i<_graph->noVertex; i++)
+                free(_graph->weight[i]);
+            free(_graph->weight);
         }
-        free(grafo->grau);
-        free(grafo);
+        free(_graph->degree);
+        free(_graph);
     }
 }
 
-int insereAresta(graph* grafo, int ini, int dest, int ehdigrafo, float peso){
-    if(grafo == NULL)
+int insertEdge(graph* _graph, int start, int destination, int isDigraph, float weight){
+    if(_graph == NULL)
         return 0;
-    if(ini < 0 || ini >= grafo->numVert)
+    if(start < 0 || start >= _graph->noVertex)
         return 0;
-    if(dest < 0 || dest >= grafo->numVert)
+    if(destination < 0 || destination >= _graph->noVertex)
         return 0;
 
-    grafo->arestas[ini][grafo->grau[ini]] = dest;
-    if(grafo->ehponderado)
-        grafo->pesos[ini][grafo->grau[ini]] = peso;
-    grafo->grau[ini]++;
+    _graph->edges[start][_graph->degree[start]] = destination;
+    if(_graph->isWeighted)
+        _graph->weight[start][_graph->degree[start]] = weight;
+    _graph->degree[start]++;
 
-    if(ehdigrafo == 0)
-        insereAresta(grafo, dest, ini, 1, peso);
+    if(isDigraph == 0)
+        insertEdge(_graph, destination, start, 1, weight);
     return 1;
 }
 
-void insere(int *vertice, int *aresta, int n, float *peso){
+void insert(int *vertex, int *edge, int n, float *weight){
 		
 		int vert=0,ares=0;
-		float pesos=0;
+		float _weight=0;
 		
 		do{
 			printf("\nVertice inicial: ");
     		scanf("%d",&vert);
 		}while( vert<0 || vert>=n);
 		
-		*vertice = vert;
+		*vertex = vert;
 		do{
 			printf("Vertice final: ");
     		scanf("%d",&ares);
 		}while( ares<0 || ares>=n);
     	
-    	*aresta = ares;
+    	*edge = ares;
     	do{
 			printf("Peso: ");
-    		scanf("%f",&pesos);
-		}while( pesos<0);
+    		scanf("%f",&weight);
+		}while( weight<0);
     	
-    	*peso= pesos;
+    	*weight= _weight;
 }
 
-int removeAresta(graph* grafo, int ini, int dest, int ehdigrafo){
-    if(grafo == NULL)
+int removeEdge(graph* _graph, int start, int destination, int isDigraph){
+    if(_graph == NULL)
         return 0;
-    if(ini < 0 || ini >= grafo->numVert)
+    if(start < 0 || start >= _graph->noVertex)
         return 0;
-    if(dest < 0 || dest >= grafo->numVert)
+    if(destination < 0 || destination >= _graph->noVertex)
         return 0;
 
     int i = 0;
-    while(i<grafo->grau[ini] && grafo->arestas[ini][i] != dest)
+    while(i<_graph->degree[start] && _graph->edges[start][i] != destination)
         i++;
-    if(i == grafo->grau[ini])//elemento nao encontrado
+    if(i == _graph->degree[start])//elemento nao encontrado
         return 0;
-    grafo->grau[ini]--;
-    grafo->arestas[ini][i] = grafo->arestas[ini][grafo->grau[ini]];
-    if(grafo->ehponderado)
-        grafo->pesos[ini][i] = grafo->pesos[ini][grafo->grau[ini]];
-    if(ehdigrafo == 0)
-        removeAresta(grafo, dest, ini, 1);
+    _graph->degree[start]--;
+    _graph->edges[start][i] = _graph->edges[start][_graph->degree[start]];
+    if(_graph->isWeighted)
+        _graph->weight[start][i] = _graph->weight[start][_graph->degree[start]];
+    if(isDigraph == 0)
+        removeEdge(_graph, destination, start, 1);
     return 1;
 }
 
-void imprimeGrafo(graph *grafo){
-    if(grafo == NULL)
+void printGraph(graph *_graph){
+    if(_graph == NULL)
         return;
     int i, j;
-    for(i=0; i < grafo->numVert; i++){
+    for(i=0; i < _graph->noVertex; i++){
         printf("%d: ", i);
-        for(j=0; j < grafo->grau[i]; j++){
-            if(grafo->ehponderado)
-                printf("%d, ", grafo->arestas[i][j], grafo->pesos[i][j]);
+        for(j=0; j < _graph->degree[i]; j++){
+            if(_graph->isWeighted)
+                printf("%d, ", _graph->edges[i][j], _graph->weight[i][j]);
             else
-                printf("%d, ", grafo->arestas[i][j]);
+                printf("%d, ", _graph->edges[i][j]);
         }
         printf("\n");
     }
 }
 
-int procuraMenorDist(float *dist, int *visit, int numVert){
+int searchBetterWay(float *dist, int *visited, int noVertex){
     int i, menor = -1, primeiro = 1;
-    for(i=0; i < numVert; i++){
-        if(dist[i] >= 0 && visit[i] == 0){
+    for(i=0; i < noVertex; i++){
+        if(dist[i] >= 0 && visited[i] == 0){
             if(primeiro){
                 menor = i;
                 primeiro = 0;
@@ -244,68 +268,68 @@ int procuraMenorDist(float *dist, int *visit, int numVert){
     return menor;
 }
 
-void menorCaminhoGrafo(graph *grafo, int ini, int *ant, float *dist){
-    int i, cont, numVert, ind, *visit, vert;
-    cont = numVert = grafo->numVert;
-    visit = (int*) malloc(numVert * sizeof(int));
-    for(i=0; i < numVert; i++){
+void betterWay(graph *_graph, int start, int *ant, float *dist){
+    int i, cont, noVertex, ind, *visited, vert;
+    cont = noVertex = _graph->noVertex;
+    visited = (int*) malloc(noVertex * sizeof(int));
+    for(i=0; i < noVertex; i++){
         ant[i] = -1;
         dist[i] = -1;
-        visit[i] = 0;
+        visited[i] = 0;
     }
-    dist[ini] = 0;
+    dist[start] = 0;
     while(cont > 0){
-        vert = procuraMenorDist(dist, visit, numVert);
+        vert = searchBetterWay(dist, visited, noVertex);
         if(vert == -1)
             break;
 
-        visit[vert] = 1;
+        visited[vert] = 1;
         cont--;
-        for(i=0; i<grafo->grau[vert]; i++){
-            ind = grafo->arestas[vert][i];
+        for(i=0; i<_graph->degree[vert]; i++){
+            ind = _graph->edges[vert][i];
             if(dist[ind] < 0){
-               dist[ind] = dist[vert] + grafo->pesos[vert][i];//peso da aresta
+               dist[ind] = dist[vert] + _graph->weight[vert][i];//weight da edge
                ant[ind] = vert;
             }else{
                 if(dist[ind] > dist[vert]+1){
-                   dist[ind] = dist[vert] + grafo->pesos[vert][i];//peso da aresta
+                   dist[ind] = dist[vert] + _graph->weight[vert][i];//weight da edge
                     ant[ind] = vert;
                 }
             }
         }
     }
 	 
-    free(visit);
+    free(visited);
 }
 
-void mostraMenorCaminho(graph* grafo,int n){
-	int ini, dest, pai;
+void printfBetterWay(graph* _graph,int n){
+	int start, destination, pai;
 	do{
 		printf("\nInicio: ");
-		scanf("%d", &ini);
-	}while(ini<0 || ini >=n);
+		scanf("%d", &start);
+	}while(start<0 || start >=n);
 	
 	do{
 		printf("Destino: ");
-		scanf("%d", &dest);	
-	}while(dest>=n || dest <0);
+		scanf("%d", &destination);	
+	}while(destination>=n || destination <0);
 	
 
-	int vetor1[grafo->numVert];
-	float vetor2[grafo->numVert];
-	menorCaminhoGrafo(grafo, ini, vetor1, vetor2);
+	int vetor1[_graph->noVertex];
+	float vetor2[_graph->noVertex];
+	betterWay(_graph, start, vetor1, vetor2);
 
-	if(vetor2[dest]!= MAX){
-		printf("\nDistacia com peso: %f\n", vetor2[dest]);
-		pai = dest;
+	if(vetor2[destination]!= MAX){
+		printf("\nDistacia com weight: %f\n", vetor2[destination]);
+		pai = destination;
 		printf("\nPercorrido: \n\n");
-		while(pai != ini){
+		while(pai != start){
 			printf("<- %d ", pai);
 			pai = vetor1[pai];
 		}
-		printf("<- %d ", ini);
+		printf("<- %d ", start);
 	}else{
-		printf("Caminho Imposs�vel\n");
+		printf("Caminho Imposs�vel\n");
 	}
 	printf("\n------------------------------\n\n");
 
